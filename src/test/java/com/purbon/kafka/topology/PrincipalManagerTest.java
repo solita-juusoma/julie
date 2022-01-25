@@ -64,7 +64,7 @@ public class PrincipalManagerTest {
     cliOps.put(BROKERS_OPTION, "");
     props = new Properties();
 
-    props.put(TOPOLOGY_EXPERIMENTAL_ENABLED_CONFIG, "true");
+    props.put(JULIE_ENABLE_PRINCIPAL_MANAGEMENT, "true");
     props.put(TOPOLOGY_STATE_FROM_CLUSTER, "false");
     props.put(ALLOW_DELETE_PRINCIPALS, true);
 
@@ -93,8 +93,8 @@ public class PrincipalManagerTest {
     Set<ServiceAccount> accounts =
         new HashSet<>(
             Arrays.asList(
-                new ServiceAccount(-1, "consumer-principal", "Managed by KTB"),
-                new ServiceAccount(-1, "producer-principal", "Managed by KTB")));
+                new ServiceAccount("-1", "consumer-principal", MANAGED_BY),
+                new ServiceAccount("-1", "producer-principal", MANAGED_BY)));
 
     assertThat(plan.getActions()).hasSize(1);
     assertThat(plan.getActions()).containsAnyOf(new CreateAccounts(provider, accounts));
@@ -122,8 +122,8 @@ public class PrincipalManagerTest {
     Set<ServiceAccount> accounts =
         new HashSet<>(
             Arrays.asList(
-                new ServiceAccount(-1, "topicConsumer-principal", "Managed by KTB"),
-                new ServiceAccount(-1, "topicProducer-principal", "Managed by KTB")));
+                new ServiceAccount("-1", "topicConsumer-principal", MANAGED_BY),
+                new ServiceAccount("-1", "topicProducer-principal", MANAGED_BY)));
 
     assertThat(plan.getActions()).hasSize(1);
     assertThat(plan.getActions()).containsAnyOf(new CreateAccounts(provider, accounts));
@@ -142,13 +142,13 @@ public class PrincipalManagerTest {
 
     doNothing().when(provider).configure();
 
-    doReturn(new ServiceAccount(123, "consumer", "Managed by KTB"))
+    doReturn(new ServiceAccount("123", "consumer", MANAGED_BY))
         .when(provider)
-        .createServiceAccount(eq("consumer"), eq("Managed by KTB"));
+        .createServiceAccount(eq("consumer"), eq(MANAGED_BY));
 
-    doReturn(new ServiceAccount(124, "producer", "Managed by KTB"))
+    doReturn(new ServiceAccount("124", "producer", MANAGED_BY))
         .when(provider)
-        .createServiceAccount(eq("producer"), eq("Managed by KTB"));
+        .createServiceAccount(eq("producer"), eq(MANAGED_BY));
 
     principalUpdateManager.updatePlan(topology, plan);
     principalDeleteManager.updatePlan(topology, plan);
@@ -167,7 +167,7 @@ public class PrincipalManagerTest {
     principalDeleteManager.updatePlan(topology, plan);
 
     Collection<ServiceAccount> accounts =
-        Arrays.asList(new ServiceAccount(124, "producer", "Managed by KTB"));
+        Arrays.asList(new ServiceAccount("124", "producer", MANAGED_BY));
 
     assertThat(plan.getActions()).hasSize(1);
     assertThat(plan.getActions()).containsAnyOf(new ClearAccounts(provider, accounts));
@@ -176,12 +176,12 @@ public class PrincipalManagerTest {
 
     assertThat(plan.getServiceAccounts()).hasSize(1);
     assertThat(plan.getServiceAccounts())
-        .contains(new ServiceAccount(123, "consumer", "Managed by KTB"));
+        .contains(new ServiceAccount("123", "consumer", MANAGED_BY));
   }
 
   @Test
   public void testNotRunIfConfigNotExperimental() throws IOException {
-    props.put(TOPOLOGY_EXPERIMENTAL_ENABLED_CONFIG, "false");
+    props.put(JULIE_ENABLE_PRINCIPAL_MANAGEMENT, "false");
 
     config = new Configuration(cliOps, props);
     principalUpdateManager = new PrincipalUpdateManager(provider, config);
@@ -214,13 +214,13 @@ public class PrincipalManagerTest {
 
     doNothing().when(provider).configure();
 
-    doReturn(new ServiceAccount(123, "consumer", "Managed by KTB"))
+    doReturn(new ServiceAccount("123", "consumer", MANAGED_BY))
         .when(provider)
-        .createServiceAccount(eq("consumer"), eq("Managed by KTB"));
+        .createServiceAccount(eq("consumer"), eq(MANAGED_BY));
 
-    doReturn(new ServiceAccount(124, "producer", "Managed by KTB"))
+    doReturn(new ServiceAccount("124", "producer", MANAGED_BY))
         .when(provider)
-        .createServiceAccount(eq("producer"), eq("Managed by KTB"));
+        .createServiceAccount(eq("producer"), eq(MANAGED_BY));
 
     principalUpdateManager.updatePlan(topology, plan);
     principalDeleteManager.updatePlan(topology, plan);
